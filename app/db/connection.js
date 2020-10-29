@@ -8,7 +8,8 @@ const db = new sqlite3.Database(':memory:', (err) => {
 });
 
 db.serialize(function () {
-    db.run("CREATE TABLE network (type TEXT, name TEXT NOT NULL PRIMARY KEY, strength INT DEFAULT 5)");
+    db.run("CREATE TABLE network (type TEXT, name TEXT NOT NULL PRIMARY KEY, strength INT, targets TEXT)");
+    // db.run("CREATE TABLE network (type TEXT, name TEXT NOT NULL PRIMARY KEY, strength INT DEFAULT 5)");
 })
 
 module.exports = db

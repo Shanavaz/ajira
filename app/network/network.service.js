@@ -2,11 +2,6 @@ const db = require('../db/connection')
 const enums = require('../db/config')['enums']
 
 
-// console.log(db.run('select * from network'))
-
-
-
-
 exports.createDevice = async (req, res) => {
     try {
         let responseMsg = ''
@@ -112,6 +107,77 @@ exports.modifyStrength = async (req, res) => {
                 });
                 return
             }
+        });
+
+
+    } catch (err) {
+        console.log(err)
+        throw new Error(err);
+    }
+}
+
+exports.createConnection = async (req, res) => {
+    try {
+        if (Object.keys(req.body).length === 0 || !(Object.keys(req.body)).includes('targets')) {
+            console.log('empty')
+            responseMsg = 'Invalid command syntax'
+            res.status(400).json({
+                msg: responseMsg
+            });
+            return
+        }
+
+        let sourceNameArr = [req.body.source]
+        db.all(`select targets from network where name = ?`, sourceNameArr, function (err, targetsResult) {
+            if (err) {
+                return console.log(err.message);
+            }
+            if ((req.body.targets).includes(req.body.source)) {
+                responseMsg = 'Cannot connect device to itself'
+                res.status(400).json({
+                    msg: responseMsg
+                });
+                return
+            }
+            console.log(targetsResult)
+            let targetsArr = req.body.targets
+            let targetArrStr = ''
+            if (targetsResult.length === 0 || targetsResult[0].targets === null) {
+                console.log('target result is null')
+                targetArrStr = ''
+            } else {
+                console.log('target result is there')
+                console.log(targetsResult)
+                targetArrStr = targetsResult[0].targets
+            }
+            for (let i = 0; i < targetsArr.length; i++) {
+                if (i === 0 && targetArrStr === '') {
+                    targetArrStr += targetsArr[i]
+                } else {
+                    targetArrStr += ',' + targetsArr[i]
+                }
+            }
+            let connectionArr = [targetArrStr, req.body.source]
+            console.log(connectionArr)
+            db.run(`UPDATE network set targets = ? where name = ?`, connectionArr, function (err) {
+                if (err) {
+                    console.log(err)
+                    res.status(400).json({
+                        msg: 'error'
+                    });
+                    return
+                }
+                // console.log(this)
+                console.log(`Updated the null target array`);
+                responseMsg = `Successfully connected`
+                res.status(200).json({
+                    msg: responseMsg
+                });
+                return
+            });
+
+
+
         });
 
 

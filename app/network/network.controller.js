@@ -6,7 +6,6 @@ exports.createDevice = async (req, res) => {
     } catch (err) {
         console.log(err)
         res.status(500).json({
-            resStatus: false,
             data: []
         });
     }
@@ -18,7 +17,6 @@ exports.getAllDevices = async (req, res) => {
     } catch (err) {
         console.log(err)
         res.status(500).json({
-            resStatus: false,
             data: []
         });
     }
@@ -30,7 +28,17 @@ exports.modifyStrength = async (req, res) => {
     } catch (err) {
         console.log(err)
         res.status(500).json({
-            resStatus: false,
+            data: []
+        });
+    }
+}
+
+exports.createConnection = async (req, res) => {
+    try {
+        await networkService.createConnection(req, res)
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
             data: []
         });
     }
